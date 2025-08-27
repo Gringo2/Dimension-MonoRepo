@@ -1,0 +1,10 @@
+{
+  "nameShort": "CodeSphere",
+  "nameLong": "CodeSphere IDE",
+  "applicationName": "codesphere",
+  "win32AppUserModelId": "codesphere",
+  "urlProtocol": "codesphere",
+  "reportIssueUrl": "https://codesphere.dev/issues",
+  "licenseName": "MIT",
+  "licenseUrl": "https://codesphere.dev/license"
+}

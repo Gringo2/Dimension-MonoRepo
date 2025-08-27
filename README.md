@@ -85,9 +85,14 @@ Edit
 - **VSCodium build dependencies** (check [VSCodium docs](https://github.com/VSCodium/vscodium))  
 
 #### Installation
-```bash
+bash
+bash
+bash
+bash
+
 git clone https://github.com/Gringo2/Dimension-MonoRepo.git
 cd Dimension-MonoRepo
+
 🛠 Usage
 Customize Branding
 
@@ -96,18 +101,11 @@ Edit branding/ assets (icons, product name, about page).
 Apply Patches
 
 Run provided patch scripts:
-
-bash
-Copy
-Edit
 ./scripts/apply-patches.sh
+
 Build
 
 Use the build script:
-
-bash
-Copy
-Edit
 ./scripts/build.sh
 Output binaries will be available in out/.
 
@@ -115,36 +113,23 @@ Output binaries will be available in out/.
 This repo includes example GitHub Actions workflows to automate builds.
 
 Windows, macOS, and Linux pipelines
-
 Artifact upload for releases
-
 Optional Docker image publishing
 
 To trigger a manual build:
-
-bash
-Copy
-Edit
 gh workflow run build.yml
+
 📍 Roadmap
- Add macOS .dmg rebranding automation
-
- Extend Windows installer branding (icons, metadata, about page)
-
- Provide Docker images for branded builds
-
- Add CLI tool for “one-command rebranding”
-
- Community branding templates (starter packs)
+[+] Add macOS .dmg rebranding automation
+[+]Extend Windows installer branding (icons, metadata, about page)
+[+] Provide Docker images for branded builds
+[+] Add CLI tool for “one-command rebranding”
+[+] Community branding templates (starter packs)
 
 🤝 Contributing
 We welcome contributions! Please check out our CONTRIBUTING.md (if available) or open an issue before starting large changes.
 
 Basic flow:
-
-bash
-Copy
-Edit
 git checkout -b feature/my-feature
 git commit -m "Add feature"
 git push origin feature/my-feature
