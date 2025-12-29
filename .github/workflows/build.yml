@@ -50,8 +50,9 @@ jobs:
     - name: Apply Codesphere branding
       run: |
         chmod +x ci/*.sh
-        ./ci/patch-branding.sh
+        ./ci/ci-branding.sh
       env:
+        OS_NAME: linux
         VSCODE_ARCH: ${{ matrix.arch }}
     
     - name: Build VSCodium
@@ -103,8 +104,12 @@ jobs:
         npm install -g node-gyp
     
     - name: Apply Codesphere branding
-      run: .\ci\patch-branding.ps1
+      shell: bash
+      run: |
+        chmod +x ci/*.sh
+        ./ci/ci-branding.sh
       env:
+        OS_NAME: windows
         VSCODE_ARCH: ${{ matrix.arch }}
     
     - name: Build VSCodium
@@ -156,8 +161,9 @@ jobs:
     - name: Apply Codesphere branding
       run: |
         chmod +x ci/*.sh
-        ./ci/patch-branding.sh
+        ./ci/ci-branding.sh
       env:
+        OS_NAME: osx
         VSCODE_ARCH: ${{ matrix.arch }}
     
     - name: Build VSCodium
