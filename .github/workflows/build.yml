@@ -1,0 +1,220 @@
+name: Build Codesphere
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  APP_NAME: Codesphere
+  BINARY_NAME: codesphere
+  VSCODE_QUALITY: stable
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [x64, arm64]
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        fetch-depth: 1
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.18'
+    
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          gcc g++ make pkg-config \
+          libx11-dev libxkbfile-dev \
+          libsecret-1-dev libkrb5-dev \
+          fakeroot rpm dpkg jq
+    
+    - name: Apply Codesphere branding
+      run: |
+        chmod +x ci/*.sh
+        ./ci/patch-branding.sh
+      env:
+        VSCODE_ARCH: ${{ matrix.arch }}
+    
+    - name: Build VSCodium
+      working-directory: vendor/vscodium
+      run: |
+        export SHOULD_BUILD=yes
+        export SHOULD_BUILD_REH=no
+        export CI_BUILD=yes
+        export OS_NAME=linux
+        export VSCODE_ARCH=${{ matrix.arch }}
+        ./build.sh
+    
+    - name: Upload Linux artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: codesphere-linux-${{ matrix.arch }}
+        path: |
+          vendor/vscodium/VSCode-linux-${{ matrix.arch }}/*.deb
+          vendor/vscodium/VSCode-linux-${{ matrix.arch }}/*.rpm
+          vendor/vscodium/VSCode-linux-${{ matrix.arch }}/*.tar.gz
+        retention-days: 30
+
+  build-windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        arch: [x64, arm64]
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        fetch-depth: 1
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.18'
+    
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install system dependencies
+      run: |
+        choco install -y jq
+        npm install -g node-gyp
+    
+    - name: Apply Codesphere branding
+      run: .\ci\patch-branding.ps1
+      env:
+        VSCODE_ARCH: ${{ matrix.arch }}
+    
+    - name: Build VSCodium
+      working-directory: vendor/vscodium
+      shell: bash
+      run: |
+        export SHOULD_BUILD=yes
+        export SHOULD_BUILD_REH=no
+        export CI_BUILD=yes
+        export OS_NAME=windows
+        export VSCODE_ARCH=${{ matrix.arch }}
+        ./build.sh
+    
+    - name: Upload Windows artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: codesphere-windows-${{ matrix.arch }}
+        path: |
+          vendor/vscodium/VSCode-win32-${{ matrix.arch }}/*.exe
+          vendor/vscodium/VSCode-win32-${{ matrix.arch }}/*.zip
+        retention-days: 30
+
+  build-macos:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        arch: [x64, arm64]
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        fetch-depth: 1
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.18'
+    
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install system dependencies
+      run: brew install jq
+    
+    - name: Apply Codesphere branding
+      run: |
+        chmod +x ci/*.sh
+        ./ci/patch-branding.sh
+      env:
+        VSCODE_ARCH: ${{ matrix.arch }}
+    
+    - name: Build VSCodium
+      working-directory: vendor/vscodium
+      run: |
+        export SHOULD_BUILD=yes
+        export SHOULD_BUILD_REH=no
+        export CI_BUILD=yes
+        export OS_NAME=osx
+        export VSCODE_ARCH=${{ matrix.arch }}
+        ./build.sh
+    
+    - name: Upload macOS artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: codesphere-macos-${{ matrix.arch }}
+        path: |
+          vendor/vscodium/VSCode-darwin-${{ matrix.arch }}/*.dmg
+          vendor/vscodium/VSCode-darwin-${{ matrix.arch }}/*.zip
+        retention-days: 30
+
+  create-release:
+    needs: [build-linux, build-windows, build-macos]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+    
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: Codesphere ${{ github.ref_name }}
+        body: |
+          ## Codesphere ${{ github.ref_name }}
+          
+          A sovereign developer IDE with zero Microsoft dependencies.
+          
+          ### Downloads
+          Choose the installer for your platform:
+          - **Windows**: `.exe` (installer) or `.zip` (portable)
+          - **macOS**: `.dmg` (installer) or `.zip` (portable)
+          - **Linux**: `.deb` (Debian/Ubuntu), `.rpm` (Fedora/RHEL), or `.tar.gz` (portable)
+          
+          ### What's New
+          See [CHANGELOG.md](CHANGELOG.md) for details.
+        files: artifacts/**/*
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

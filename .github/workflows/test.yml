@@ -1,0 +1,80 @@
+name: Quick Build Test
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  APP_NAME: Codesphere
+  BINARY_NAME: codesphere
+  VSCODE_QUALITY: stable
+
+jobs:
+  compliance-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.18'
+    
+    - name: Install ripgrep
+      run: sudo apt-get update && sudo apt-get install -y ripgrep
+    
+    - name: Apply branding
+      run: |
+        chmod +x ci/*.sh
+        ./ci/patch-branding.sh
+    
+    - name: Run compliance check
+      run: ./ci/compliance-check.sh
+      continue-on-error: false
+
+  test-build-linux-x64:
+    runs-on: ubuntu-latest
+    needs: compliance-check
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.18'
+    
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc g++ make pkg-config libx11-dev libxkbfile-dev libsecret-1-dev jq
+    
+    - name: Apply branding
+      run: |
+        chmod +x ci/*.sh
+        ./ci/patch-branding.sh
+    
+    - name: Test compile
+      working-directory: vendor/vscodium/vscode
+      run: |
+        yarn install --frozen-lockfile
+        yarn compile
+    
+    - name: Verify branding
+      run: |
+        echo "✅ Compilation successful"
+        echo "Checking product.json..."
+        cat vendor/vscodium/vscode/product.json | jq '.nameShort, .applicationName, .extensionsGallery.serviceUrl'
