@@ -28,10 +28,18 @@ jobs:
     - name: Install ripgrep
       run: sudo apt-get update && sudo apt-get install -y ripgrep
     
-    - name: Apply branding
+    - name: Apply Codesphere branding
       run: |
         chmod +x ci/*.sh
-        ./ci/patch-branding.sh
+        ./ci/ci-branding.sh
+    
+    - name: Prepare VSCode source
+      working-directory: vendor/vscodium
+      run: |
+        export SHOULD_BUILD=yes
+        export CI_BUILD=yes
+        export OS_NAME=linux
+        ./prepare_vscode.sh
     
     - name: Run compliance check
       run: ./ci/compliance-check.sh
@@ -62,10 +70,18 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y gcc g++ make pkg-config libx11-dev libxkbfile-dev libsecret-1-dev jq
     
-    - name: Apply branding
+    - name: Apply Codesphere branding
       run: |
         chmod +x ci/*.sh
-        ./ci/patch-branding.sh
+        ./ci/ci-branding.sh
+    
+    - name: Prepare VSCode source
+      working-directory: vendor/vscodium
+      run: |
+        export SHOULD_BUILD=yes
+        export CI_BUILD=yes
+        export OS_NAME=linux
+        ./prepare_vscode.sh
     
     - name: Test compile
       working-directory: vendor/vscodium/vscode

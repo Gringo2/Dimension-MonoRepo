@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# Codesphere CI Branding Script
+# Simpler version for CI environments that integrates with VSCodium's build.sh
+
+set -e
+
+echo "🚀 Starting Codesphere CI branding..."
+
+# Define paths
+REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+VSCODIUM_DIR="$REPO_ROOT/vendor/vscodium"
+BRANDING_DIR="$REPO_ROOT/branding"
+
+# Export environment variables that VSCodium's scripts will use
+export APP_NAME="Codesphere"
+export APP_NAME_LC="codesphere"
+export BINARY_NAME="codesphere"
+export GH_REPO_PATH="Codesphere/codesphere"
+export ORG_NAME="Codesphere"
+export ASSETS_REPOSITORY="Codesphere/codesphere"
+export VSCODE_QUALITY="${VSCODE_QUALITY:-stable}"
+export SHOULD_BUILD="yes"
+export SHOULD_BUILD_REH="no"
+export CI_BUILD="yes"
+export DISABLE_UPDATE="no"
+export OS_NAME="${OS_NAME:-linux}"
+
+echo "📦 Environment configured:"
+echo "  APP_NAME: $APP_NAME"
+echo "  BINARY_NAME: $BINARY_NAME"
+echo "  VSCODE_QUALITY: $VSCODE_QUALITY"
+echo "  OS_NAME: $OS_NAME"
+echo ""
+
+# Step 1: Copy Codesphere branding assets to VSCodium source locations
+# These will be picked up by VSCodium's prepare_vscode.sh script
+echo "📦 Step 1: Copying Codesphere assets to VSCodium..."
+cd "$VSCODIUM_DIR" || exit 1
+
+# Copy our custom product.json
+if [ -f "$BRANDING_DIR/product.json" ]; then
+  cp "$BRANDING_DIR/product.json" product.json
+  echo "  ✅ Codesphere product.json copied"
+fi
+
+# Copy icons to VSCodium's icon locations
+if [ -d "icons/stable" ]; then
+  if [ -f "$BRANDING_DIR/code.png" ]; then
+    cp "$BRANDING_DIR/code.png" icons/stable/codium_src.png
+    echo "  ✅ Icons copied"
+  fi
+fi
+
+echo ""
+echo "✨ Codesphere branding setup complete!"
+echo "VSCodium's build.sh will now integrate these into the build."
