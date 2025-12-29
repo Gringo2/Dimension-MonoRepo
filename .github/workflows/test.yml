@@ -39,6 +39,7 @@ jobs:
         export SHOULD_BUILD=yes
         export CI_BUILD=yes
         export OS_NAME=linux
+        ./get_repo.sh
         ./prepare_vscode.sh
     
     - name: Run compliance check
@@ -81,6 +82,7 @@ jobs:
         export SHOULD_BUILD=yes
         export CI_BUILD=yes
         export OS_NAME=linux
+        ./get_repo.sh
         ./prepare_vscode.sh
     
     - name: Test compile
