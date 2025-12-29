@@ -1,143 +1,169 @@
-# Dimension-MonoRepo
-Open-source MonoRepo of Vscodium. Rebranding done easy.
+# Codesphere Rebranding Project
 
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/Gringo2/Dimension-MonoRepo/build.yml?branch=main&label=Build&logo=github&style=flat-square)
-![GitHub Issues](https://img.shields.io/github/issues/Gringo2/Dimension-MonoRepo?style=flat-square)
-![GitHub License](https://img.shields.io/github/license/Gringo2/Dimension-MonoRepo?style=flat-square)
-![GitHub Repo Size](https://img.shields.io/github/repo-size/Gringo2/Dimension-MonoRepo?style=flat-square)
-![GitHub Top Language](https://img.shields.io/github/languages/top/Gringo2/Dimension-MonoRepo?style=flat-square)
+A sovereign developer IDE distribution based on VSCodium/VS Code with complete Microsoft independence.
 
----
+## Architecture
 
-## Dimension-MonoRepo
+Codesphere is a hardened, production-ready rebranding of VSCodium that enforces:
+- **Complete identity sovereignty** (no Microsoft/VS Code branding)
+- **Independent extension registry** (Open VSX by default)
+- **Zero telemetry** (all Microsoft endpoints disabled)
+- **Reproducible builds** (conflict-resistant upstream merges)
 
-**Open-source monorepo for VSCodium rebranding — rebranding made easy.**
+## Quick Start
 
-> A unified repository designed to simplify customizing and rebranding VSCodium. Whether you want to create a white-label IDE, change product branding, or experiment with custom builds, Dimension-MonoRepo gives you the structure and tools to do it faster.
+### Prerequisites
+- Node.js 20.18+
+- Python 3.11+
+- Git
+- Bash (Git Bash on Windows)
+- jq (optional, for JSON merging)
 
----
+### Build Codesphere
 
-### 📖 Table of Contents
-1. [About](#about)  
-2. [Why Use Dimension-MonoRepo?](#why-use-dimension-monorepo)  
-3. [Features](#features)  
-4. [Repository Structure](#repository-structure)  
-5. [Getting Started](#getting-started)  
-6. [Usage](#usage)  
-7. [Build & CI/CD](#build--cicd)  
-8. [Roadmap](#roadmap)  
-9. [Contributing](#contributing)  
-10. [License](#license)  
-11. [Contact](#contact)
+#### Windows
+```powershell
+.\ci\patch-branding.ps1
+```
 
----
+#### Linux/macOS
+```bash
+./ci/patch-branding.sh
+```
 
-### 🔹 About
-Dimension-MonoRepo centralizes the full rebranding workflow of VSCodium. Instead of juggling scattered scripts or manual edits, you can rely on one monorepo that handles patches, build pipelines, and packaging consistently.
+The script will:
+1. Sync the VSCodium submodule
+2. Fetch upstream VS Code source
+3. Apply Codesphere branding
+4. Replace all icons and assets
+5. Run automated compliance checks
 
-This project is **community-driven** and aims to lower the barrier for developers and organizations who need a custom-branded version of VSCodium.
+### Manual Build Steps
 
----
+If you prefer manual control:
 
-### 💡 Why Use Dimension-MonoRepo?
-- **Consistency** – Everything needed for rebranding lives in one place.  
-- **Saves Time** – Skip the trial-and-error of modifying build scripts manually.  
-- **Scalable** – Perfect for teams maintaining multiple branded IDEs.  
-- **CI/CD Ready** – Works smoothly with GitHub Actions, GitLab CI, or any pipeline.  
-- **Open Source** – BSD-2-Clause licensed for full flexibility.  
+```bash
+# 1. Set environment variables
+export APP_NAME="Codesphere"
+export BINARY_NAME="codesphere"
+export VSCODE_QUALITY="stable"
 
----
+# 2. Prepare VS Code source
+cd vendor/vscodium
+./prepare_vscode.sh
 
-### ✨ Features
-- Preconfigured **branding patches** (name, logos, metadata).  
-- Ready-to-use **build automation scripts**.  
-- Cross-platform compatibility (Linux, macOS, Windows).  
-- Example workflows for GitHub Actions.  
-- Centralized dependency management in a monorepo.  
-- Extendable for custom themes, extensions, or settings.  
+# 3. Apply branding
+cd vscode
+cp ../../../branding/product.json product.json
 
----
+# 4. Build
+yarn install --frozen-lockfile
+yarn compile
 
-### 🗂 Repository Structure
+# 5. Package (choose your platform)
+yarn gulp vscode-win32-x64-min      # Windows
+yarn gulp vscode-darwin-min         # macOS
+yarn gulp vscode-linux-x64-min      # Linux
+```
+
+## Project Structure
+
+```
 Dimension-MonoRepo/
-│
-├── branding/ # Branding assets (logos, icons, names, about text)
-├── patches/ # Patch scripts applied to VSCodium
-├── build/ # Build automation scripts
-├── ci/ # Example CI/CD workflows (GitHub Actions, etc.)
-├── docs/ # Documentation & guides
-├── scripts/ # Helper scripts (install, release, update)
-└── LICENSE # BSD-2-Clause license
+├── branding/              # Codesphere branding assets
+│   ├── product.json       # Sovereign identity configuration
+│   ├── code.ico           # Windows icon
+│   ├── code.icns          # macOS icon
+│   ├── code.png           # Linux icon
+│   └── code.svg           # Vector logo
+├── ci/                    # Automation scripts
+│   ├── patch-branding.sh  # Linux/macOS pipeline
+│   ├── patch-branding.ps1 # Windows pipeline
+│   ├── compliance-check.sh
+│   └── compliance-check.ps1
+└── vendor/
+    └── vscodium/          # Git submodule
+```
 
-markdown
-Copy
-Edit
+## Branding Controls
 
----
+All branding is controlled through:
+1. **`branding/product.json`** - Product metadata, extension registry, telemetry settings
+2. **`branding/icons/`** - Platform-specific icons
+3. **Environment variables** - Runtime configuration (APP_NAME, BINARY_NAME, etc.)
 
-### 🚀 Getting Started
+### Key Configuration Points
 
-#### Prerequisites
-- **Git** – clone and manage the repo  
-- **Node.js** – needed for build scripts  
-- **Yarn / npm** – package management  
-- **Docker** *(optional)* – for containerized builds  
-- **VSCodium build dependencies** (check [VSCodium docs](https://github.com/VSCodium/vscodium))  
+#### Extension Registry
+```json
+"extensionsGallery": {
+  "serviceUrl": "https://open-vsx.org/vscode/gallery",
+  "itemUrl": "https://open-vsx.org/vscode/item"
+}
+```
 
-#### Installation
-bash
-bash
-bash
-bash
+#### Telemetry (Disabled)
+```json
+"telemetry.enableTelemetry": false,
+"telemetry.enableCrashReporter": false
+```
 
-git clone https://github.com/Gringo2/Dimension-MonoRepo.git
-cd Dimension-MonoRepo
+#### Platform Identifiers
+- Windows: `Codesphere.Codesphere`
+- macOS: `com.codesphere.ide`
+- Linux: `codesphere`
 
-🛠 Usage
-Customize Branding
+## Verification
 
-Edit branding/ assets (icons, product name, about page).
+### Automated Compliance
+```bash
+./ci/compliance-check.sh
+```
 
-Apply Patches
+This checks for forbidden references to:
+- "VSCodium"
+- "Visual Studio Code"
+- "VS Code"
+- "Microsoft Corporation"
 
-Run provided patch scripts:
-./scripts/apply-patches.sh
+### Manual Verification
+1. Launch the built IDE
+2. Check **Help → About** shows "Codesphere IDE"
+3. Verify window title shows "Codesphere"
+4. Search for an extension (should use Open VSX)
+5. Monitor network traffic (no Microsoft endpoints)
 
-Build
+## Upstream Merge Strategy
 
-Use the build script:
-./scripts/build.sh
-Output binaries will be available in out/.
+Codesphere minimizes merge conflicts by isolating branding to:
+- `product.json` (overwritten)
+- Icon files (replaced)
+- Environment variables (injected at build time)
 
-⚡ Build & CI/CD
-This repo includes example GitHub Actions workflows to automate builds.
+When VSCodium updates:
+1. Pull latest VSCodium: `git submodule update --remote`
+2. Re-run branding pipeline: `./ci/patch-branding.sh`
+3. Test and verify
 
-Windows, macOS, and Linux pipelines
-Artifact upload for releases
-Optional Docker image publishing
+## Development
 
-To trigger a manual build:
-gh workflow run build.yml
+### Adding New Branding Points
+1. Update `branding/product.json` with new fields
+2. Update `ci/patch-branding.sh` if new file replacements needed
+3. Add patterns to `ci/compliance-check.sh` if new forbidden terms identified
 
-📍 Roadmap
-[+] Add macOS .dmg rebranding automation
-[+]Extend Windows installer branding (icons, metadata, about page)
-[+] Provide Docker images for branded builds
-[+] Add CLI tool for “one-command rebranding”
-[+] Community branding templates (starter packs)
+### Testing Locally
+The build can be tested without full packaging:
+```bash
+cd vendor/vscodium/vscode
+yarn watch
+./scripts/code.sh  # Linux/macOS
+# or
+.\scripts\code.bat  # Windows
+```
 
-🤝 Contributing
-We welcome contributions! Please check out our CONTRIBUTING.md (if available) or open an issue before starting large changes.
+## License
 
-Basic flow:
-git checkout -b feature/my-feature
-git commit -m "Add feature"
-git push origin feature/my-feature
-Then open a Pull Request 🚀
+MIT License - See [LICENSE](LICENSE) for details.
 
-📜 License
-This project is licensed under the BSD-2-Clause License – see LICENSE for details.
-
-📬 Contact
-Maintained by @Gringo2.
-Questions, ideas, or issues? Open a GitHub issue or start a discussion in the repo.
+Codesphere is a sovereign distribution of VS Code (MIT licensed) via VSCodium.

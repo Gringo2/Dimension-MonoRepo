@@ -1,10 +1,41 @@
 {
-  "nameShort": "CodeSphere",
-  "nameLong": "CodeSphere IDE",
+  "nameShort": "Codesphere",
+  "nameLong": "Codesphere IDE",
   "applicationName": "codesphere",
-  "win32AppUserModelId": "codesphere",
+  "dataFolderName": ".codesphere",
+  "linuxIconName": "codesphere",
+  "quality": "stable",
   "urlProtocol": "codesphere",
-  "reportIssueUrl": "https://codesphere.dev/issues",
+  "win32AppUserModelId": "Codesphere.Codesphere",
+  "win32AppId": "{{A8B3C4D5-E6F7-4890-A1B2-C3D4E5F67890}}",
+  "win32x64AppId": "{{B9C4D5E6-F7A8-5901-B2C3-D4E5F6789012}}",
+  "win32arm64AppId": "{{C0D5E6F7-A8B9-6012-C3D4-E5F678901234}}",
+  "win32UserAppId": "{{D1E6F7A8-B9C0-7123-D4E5-F6789012345A}}",
+  "win32x64UserAppId": "{{E2F7A8B9-C0D1-8234-E5F6-789012345ABC}}",
+  "win32arm64UserAppId": "{{F3A8B9C0-D1E2-9345-F678-9012345ABCDE}}",
+  "win32DirName": "Codesphere",
+  "win32MutexName": "codesphere",
+  "win32NameVersion": "Codesphere",
+  "win32RegValueName": "Codesphere",
+  "win32ShellNameShort": "Codesphere",
+  "darwinBundleIdentifier": "com.codesphere.ide",
+  "serverApplicationName": "codesphere-server",
+  "serverDataFolderName": ".codesphere-server",
+  "tunnelApplicationName": "codesphere-tunnel",
+  "win32TunnelServiceMutex": "codesphere-tunnelservice",
+  "win32TunnelMutex": "codesphere-tunnel",
   "licenseName": "MIT",
-  "licenseUrl": "https://codesphere.dev/license"
+  "licenseUrl": "https://github.com/Codesphere/codesphere/blob/master/LICENSE",
+  "extensionsGallery": {
+    "serviceUrl": "https://open-vsx.org/vscode/gallery",
+    "itemUrl": "https://open-vsx.org/vscode/item",
+    "extensionUrlTemplate": "https://open-vsx.org/vscode/gallery/{publisher}/{name}/latest",
+    "controlUrl": "https://raw.githubusercontent.com/EclipseFdn/publish-extensions/refs/heads/master/extension-control/extensions.json"
+  },
+  "linkProtectionTrustedDomains": [
+    "https://open-vsx.org"
+  ],
+  "reportIssueUrl": "https://github.com/Codesphere/codesphere/issues/new",
+  "releaseNotesUrl": "https://github.com/Codesphere/codesphere/releases",
+  "documentationUrl": "https://github.com/Codesphere/codesphere/wiki"
 }
