@@ -60,9 +60,10 @@ jobs:
       run: |
         export SHOULD_BUILD=yes
         export SHOULD_BUILD_REH=no
-        export CI_BUILD=yes
+        export CI_BUILD=no
         export OS_NAME=linux
         export VSCODE_ARCH=${{ matrix.arch }}
+        ./get_repo.sh
         ./build.sh
     
     - name: Upload Linux artifacts
@@ -118,9 +119,10 @@ jobs:
       run: |
         export SHOULD_BUILD=yes
         export SHOULD_BUILD_REH=no
-        export CI_BUILD=yes
+        export CI_BUILD=no
         export OS_NAME=windows
         export VSCODE_ARCH=${{ matrix.arch }}
+        ./get_repo.sh
         ./build.sh
     
     - name: Upload Windows artifacts
@@ -171,9 +173,10 @@ jobs:
       run: |
         export SHOULD_BUILD=yes
         export SHOULD_BUILD_REH=no
-        export CI_BUILD=yes
+        export CI_BUILD=no
         export OS_NAME=osx
         export VSCODE_ARCH=${{ matrix.arch }}
+        ./get_repo.sh
         ./build.sh
     
     - name: Upload macOS artifacts
