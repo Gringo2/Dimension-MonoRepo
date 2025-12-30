@@ -56,6 +56,13 @@ jobs:
         OS_NAME: linux
         VSCODE_ARCH: ${{ matrix.arch }}
     
+    - name: Fetch VSCodium Source
+      working-directory: vendor/vscodium
+      run: ./get_repo.sh
+      env:
+        OS_NAME: linux
+        VSCODE_ARCH: ${{ matrix.arch }}
+        
     - name: Build VSCodium
       working-directory: vendor/vscodium
       run: |
@@ -71,7 +78,6 @@ jobs:
           export CXX_aarch64_unknown_linux_gnu=aarch64-linux-gnu-g++
         fi
         
-        ./get_repo.sh
         ./build.sh
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -123,6 +129,14 @@ jobs:
         OS_NAME: windows
         VSCODE_ARCH: ${{ matrix.arch }}
     
+    - name: Fetch VSCodium Source
+      working-directory: vendor/vscodium
+      shell: bash
+      run: ./get_repo.sh
+      env:
+        OS_NAME: windows
+        VSCODE_ARCH: ${{ matrix.arch }}
+
     - name: Build VSCodium
       working-directory: vendor/vscodium
       shell: bash
@@ -132,7 +146,6 @@ jobs:
         export CI_BUILD=no
         export OS_NAME=windows
         export VSCODE_ARCH=${{ matrix.arch }}
-        ./get_repo.sh
         ./build.sh
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -182,6 +195,13 @@ jobs:
         OS_NAME: osx
         VSCODE_ARCH: ${{ matrix.arch }}
     
+    - name: Fetch VSCodium Source
+      working-directory: vendor/vscodium
+      run: ./get_repo.sh
+      env:
+        OS_NAME: osx
+        VSCODE_ARCH: ${{ matrix.arch }}
+
     - name: Build VSCodium
       working-directory: vendor/vscodium
       run: |
@@ -190,7 +210,6 @@ jobs:
         export CI_BUILD=no
         export OS_NAME=osx
         export VSCODE_ARCH=${{ matrix.arch }}
-        ./get_repo.sh
         ./build.sh
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
