@@ -52,6 +52,30 @@ if [ -d "icons/stable" ]; then
 fi
 
 echo ""
+
+# Patch prepare_vscode.sh to prevent it from overwriting our branding
+if [ -f "$VSCODIUM_DIR/prepare_vscode.sh" ]; then
+  echo "🔧 Patching prepare_vscode.sh to preserve Codesphere branding..."
+  
+  # Comment out hardcoded VSCodium branding in the stable block
+  perl -pi -e 's/setpath "product" "nameShort" "VSCodium"/# setpath "product" "nameShort" "VSCodium"/' "$VSCODIUM_DIR/prepare_vscode.sh"
+  perl -pi -e 's/setpath "product" "nameLong" "VSCodium"/# setpath "product" "nameLong" "VSCodium"/' "$VSCODIUM_DIR/prepare_vscode.sh"
+  perl -pi -e 's/setpath "product" "applicationName" "codium"/# setpath "product" "applicationName" "codium"/' "$VSCODIUM_DIR/prepare_vscode.sh"
+  perl -pi -e 's/setpath "product" "linuxIconName" "vscodium"/# setpath "product" "linuxIconName" "vscodium"/' "$VSCODIUM_DIR/prepare_vscode.sh"
+  perl -pi -e 's/setpath "product" "urlProtocol" "vscodium"/# setpath "product" "urlProtocol" "vscodium"/' "$VSCODIUM_DIR/prepare_vscode.sh"
+  perl -pi -e 's/setpath "product" "serverApplicationName" "codium-server"/# setpath "product" "serverApplicationName" "codium-server"/' "$VSCODIUM_DIR/prepare_vscode.sh"
+  perl -pi -e 's/setpath "product" "serverDataFolderName" ".vscodium-server"/# setpath "product" "serverDataFolderName" ".vscodium-server"/' "$VSCODIUM_DIR/prepare_vscode.sh"
+  perl -pi -e 's/setpath "product" "darwinBundleIdentifier" "com.vscodium"/# setpath "product" "darwinBundleIdentifier" "com.vscodium"/' "$VSCODIUM_DIR/prepare_vscode.sh"
+  perl -pi -e 's/setpath "product" "win32AppUserModelId" "VSCodium.VSCodium"/# setpath "product" "win32AppUserModelId" "VSCodium.VSCodium"/' "$VSCODIUM_DIR/prepare_vscode.sh"
+  perl -pi -e 's/setpath "product" "win32DirName" "VSCodium"/# setpath "product" "win32DirName" "VSCodium"/' "$VSCODIUM_DIR/prepare_vscode.sh"
+  perl -pi -e 's/setpath "product" "win32MutexName" "vscodium"/# setpath "product" "win32MutexName" "vscodium"/' "$VSCODIUM_DIR/prepare_vscode.sh"
+  perl -pi -e 's/setpath "product" "win32NameVersion" "VSCodium"/# setpath "product" "win32NameVersion" "VSCodium"/' "$VSCODIUM_DIR/prepare_vscode.sh"
+  perl -pi -e 's/setpath "product" "win32RegValueName" "VSCodium"/# setpath "product" "win32RegValueName" "VSCodium"/' "$VSCODIUM_DIR/prepare_vscode.sh"
+  perl -pi -e 's/setpath "product" "win32ShellNameShort" "VSCodium"/# setpath "product" "win32ShellNameShort" "VSCodium"/' "$VSCODIUM_DIR/prepare_vscode.sh"
+  
+  echo "  ✅ prepare_vscode.sh patched"
+fi
+
 echo "✨ Codesphere branding setup complete!"
 echo "VSCodium's build.sh will now integrate these into the build."
 
