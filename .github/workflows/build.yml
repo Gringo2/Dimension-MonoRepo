@@ -170,7 +170,9 @@ jobs:
         python-version: '3.11'
     
     - name: Install system dependencies
-      run: brew install jq
+      run: |
+        brew install jq
+        rustup target add x86_64-apple-darwin aarch64-apple-darwin
     
     - name: Apply Codesphere branding
       run: |
