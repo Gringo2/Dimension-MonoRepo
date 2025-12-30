@@ -75,23 +75,7 @@ if [ -f "$VSCODIUM_DIR/prepare_vscode.sh" ]; then
   echo "  ✅ prepare_vscode.sh patched"
 fi
 
-# Step 3: Brand Enforcement (Source Code Replacements)
-# This will be run AFTER get_repo.sh but we can prepare the script or patch
-# Since get_repo.sh hasn't run yet in the CI flow (it runs in a separate step),
-# we will add a hook that can be called later or just perform replacements
-# if the directory exists.
-if [ -d "vscode" ]; then
-  echo "🔍 Enforcing brand references in source code..."
-  cd vscode
-  # Replace VSCodium with Codesphere in UI strings, but avoid breaking URLs
-  # This is a basic set of replacements; more can be added
-  find . -type f \( -name "*.ts" -o -name "*.js" -o -name "*.html" -o -name "*.json" \) -not -path "*/node_modules/*" -exec perl -pi -e 's/(?<!github.com\/)VSCodium/Codesphere/g' {} +
-  find . -type f \( -name "*.ts" -o -name "*.js" -o -name "*.html" -o -name "*.json" \) -not -path "*/node_modules/*" -exec perl -pi -e 's/(?<!github.com\/)vscodium/codesphere/g' {} +
-  echo "  ✅ Source code branding enforced"
-  cd ..
-fi
-
-# Patch build_cli.sh to handle macOS app renaming
+# Step 3: Patch build_cli.sh to handle macOS app renaming
 if [ -f "$VSCODIUM_DIR/build_cli.sh" ]; then
   echo "🔧 Patching build_cli.sh for macOS app naming..."
   perl -pi -e 'print "  if [ -d \"../../VSCode-darwin-\${VSCODE_ARCH}/VSCodium.app\" ] && [ ! -d \"../../VSCode-darwin-\${VSCODE_ARCH}/\${NAME_SHORT}.app\" ]; then mv \"../../VSCode-darwin-\${VSCODE_ARCH}/VSCodium.app\" \"../../VSCode-darwin-\${VSCODE_ARCH}/\${NAME_SHORT}.app\"; fi\n" if /cp "target\/\${VSCODE_CLI_TARGET}\/release\/code"/' "$VSCODIUM_DIR/build_cli.sh"
