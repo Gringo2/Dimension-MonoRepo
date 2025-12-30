@@ -64,6 +64,13 @@ jobs:
         export CI_BUILD=no
         export OS_NAME=linux
         export VSCODE_ARCH=${{ matrix.arch }}
+        
+        if [ "${{ matrix.arch }}" == "arm64" ]; then
+          export CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc
+          export CC_aarch64_unknown_linux_gnu=aarch64-linux-gnu-gcc
+          export CXX_aarch64_unknown_linux_gnu=aarch64-linux-gnu-g++
+        fi
+        
         ./get_repo.sh
         ./build.sh
     
