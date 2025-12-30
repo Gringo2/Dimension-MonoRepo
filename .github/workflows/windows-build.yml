@@ -1,0 +1,119 @@
+name: Windows Build
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+    paths:
+      - '.github/workflows/windows-build.yml'
+      - 'branding/**'
+      - 'ci/**'
+      - 'vendor/vscodium/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/windows-build.yml'
+      - 'branding/**'
+      - 'ci/**'
+      - 'vendor/vscodium/**'
+  workflow_dispatch:
+
+env:
+  APP_NAME: Codesphere
+  BINARY_NAME: codesphere
+  VSCODE_QUALITY: stable
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        arch: [x64, arm64]
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        fetch-depth: 1
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+    
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install system dependencies
+      run: |
+        choco install -y jq ripgrep
+        npm install -g node-gyp
+    
+    - name: Apply Codesphere branding
+      shell: bash
+      run: |
+        chmod +x ci/*.sh
+        ./ci/ci-branding.sh
+      env:
+        OS_NAME: windows
+        VSCODE_ARCH: ${{ matrix.arch }}
+    
+    - name: Fetch VSCodium Source
+      working-directory: vendor/vscodium
+      shell: bash
+      run: ./get_repo.sh
+      env:
+        OS_NAME: windows
+        VSCODE_ARCH: ${{ matrix.arch }}
+
+    - name: Enforce Source Branding
+      shell: bash
+      run: ./ci/enforce-branding.sh
+      env:
+        OS_NAME: windows
+        
+    - name: Run Compliance Check
+      shell: bash
+      run: ./ci/compliance-check.sh
+      continue-on-error: true
+
+    - name: Build VSCodium
+      working-directory: vendor/vscodium
+      shell: bash
+      run: |
+        export SHOULD_BUILD=yes
+        export SHOULD_BUILD_REH=no
+        export CI_BUILD=no
+        export OS_NAME=windows
+        export VSCODE_ARCH=${{ matrix.arch }}
+        ./build.sh
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Upload Windows artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: codesphere-windows-${{ matrix.arch }}
+        path: |
+          vendor/vscodium/VSCode-win32-${{ matrix.arch }}/*.exe
+          vendor/vscodium/VSCode-win32-${{ matrix.arch }}/*.zip
+        retention-days: 30
+
+    - name: Create / Update Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/v')
+      with:
+        name: Codesphere ${{ github.ref_name }}
+        body: |
+          ## Codesphere ${{ github.ref_name }}
+          A sovereign developer IDE with zero Microsoft dependencies.
+        files: |
+          vendor/vscodium/VSCode-win32-${{ matrix.arch }}/*.exe
+          vendor/vscodium/VSCode-win32-${{ matrix.arch }}/*.zip
+        append_body: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

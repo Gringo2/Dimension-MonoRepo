@@ -6,6 +6,8 @@
   "linuxIconName": "codesphere",
   "quality": "stable",
   "urlProtocol": "codesphere",
+  "telemetry.enableTelemetry": false,
+  "telemetry.enableCrashReporter": false,
   "win32AppUserModelId": "Codesphere.Codesphere",
   "win32AppId": "{{4A5B6C7D-8E9F-4A1B-9C3D-4E5F6A7B8C9D}}",
   "win32x64AppId": "{{5B6C7D8E-9F0A-4B2C-AD4E-5F6A7B8C9D0E}}",
