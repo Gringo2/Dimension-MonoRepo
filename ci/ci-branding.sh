@@ -54,3 +54,11 @@ fi
 echo ""
 echo "✨ Codesphere branding setup complete!"
 echo "VSCodium's build.sh will now integrate these into the build."
+
+# Patch build_cli.sh to handle macOS app renaming if Gulp output defaults to VSCodium.app
+if [ -f "$VSCODIUM_DIR/build_cli.sh" ]; then
+  echo "🔧 Patching build_cli.sh for macOS app naming..."
+  # Use perl for cross-platform in-place editing compatibility
+  perl -pi -e 'print "  if [ -d \"../../VSCode-darwin-\${VSCODE_ARCH}/VSCodium.app\" ] && [ ! -d \"../../VSCode-darwin-\${VSCODE_ARCH}/\${NAME_SHORT}.app\" ]; then mv \"../../VSCode-darwin-\${VSCODE_ARCH}/VSCodium.app\" \"../../VSCode-darwin-\${VSCODE_ARCH}/\${NAME_SHORT}.app\"; fi\n" if /cp "target\/\${VSCODE_CLI_TARGET}\/release\/code"/' "$VSCODIUM_DIR/build_cli.sh"
+  echo "  ✅ build_cli.sh patched"
+fi
