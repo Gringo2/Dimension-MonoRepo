@@ -7,7 +7,13 @@ set -e
 echo "🔍 Enforcing Codesphere branding in source code..."
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+CI_DIR="$REPO_ROOT/ci"
 VSCODE_DIR="$REPO_ROOT/vendor/vscodium/vscode"
+
+# Load central environment
+if [ -f "$CI_DIR/env.sh" ]; then
+  . "$CI_DIR/env.sh"
+fi
 
 if [ ! -d "$VSCODE_DIR" ]; then
   echo "❌ Error: VS Code source directory not found at $VSCODE_DIR"

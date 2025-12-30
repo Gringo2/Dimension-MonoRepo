@@ -1,35 +1,22 @@
 #!/usr/bin/env bash
 # Codesphere CI Branding Script
-# Comprehensive version that enforces identity across config, assets, and source code.
+# Performs asset injection and build script patching to preserve Codesphere identity.
 
 set -e
 
-echo "🚀 Starting Codesphere CI branding..."
-
 # Define paths
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+CI_DIR="$REPO_ROOT/ci"
 VSCODIUM_DIR="$REPO_ROOT/vendor/vscodium"
 BRANDING_DIR="$REPO_ROOT/branding"
 
-# Export environment variables for VSCodium's scripts
-export APP_NAME="Codesphere"
-export APP_NAME_LC="codesphere"
-export BINARY_NAME="codesphere"
-export GH_REPO_PATH="Codesphere/codesphere"
-export ORG_NAME="Codesphere"
-export ASSETS_REPOSITORY="Codesphere/codesphere"
-export VSCODE_QUALITY="${VSCODE_QUALITY:-stable}"
-export SHOULD_BUILD="yes"
-export SHOULD_BUILD_REH="no"
-export CI_BUILD="yes"
-export DISABLE_UPDATE="no"
-export OS_NAME="${OS_NAME:-linux}"
+# Load central environment (if not already loaded)
+if [ -f "$CI_DIR/env.sh" ]; then
+  . "$CI_DIR/env.sh"
+fi
 
-echo "📦 Environment configured:"
-echo "  APP_NAME: $APP_NAME"
-echo "  BINARY_NAME: $BINARY_NAME"
-echo "  VSCODE_QUALITY: $VSCODE_QUALITY"
-echo ""
+echo "🚀 Starting Codesphere branding application..."
+echo "📦 Environment: $APP_NAME ($VSCODE_QUALITY)"
 
 # Step 1: Copy Codesphere branding assets to VSCodium source locations
 echo "📦 Step 1: Copying Codesphere assets to VSCodium..."
@@ -72,6 +59,9 @@ if [ -f "$VSCODIUM_DIR/prepare_vscode.sh" ]; then
   # We use a broad replacement to ensure all setpaths for branding are neutralized
   perl -pi -e 's/setpath "product" "(nameShort|nameLong|applicationName|linuxIconName|urlProtocol|serverApplicationName|serverDataFolderName|darwinBundleIdentifier|win32AppUserModelId|win32DirName|win32MutexName|win32NameVersion|win32RegValueName|win32ShellNameShort)" ".*"/# branding parameter suppressed by Codesphere patch/' "$VSCODIUM_DIR/prepare_vscode.sh"
   
+  # Ensure the product.json merge at the end doesn't overwrite our product.json if we want to be safe,
+  # but our product.json IS the one we want to merge with anyway.
+  
   echo "  ✅ prepare_vscode.sh patched"
 fi
 
@@ -82,5 +72,11 @@ if [ -f "$VSCODIUM_DIR/build_cli.sh" ]; then
   echo "  ✅ build_cli.sh patched"
 fi
 
-echo "✨ Codesphere branding setup complete!"
-echo "VSCodium scripts will now produce a fully branded Codesphere IDE."
+# Step 4: Patch build.sh to allow skipping prepare_vscode.sh if source is already prepared
+if [ -f "$VSCODIUM_DIR/build.sh" ]; then
+  echo "🔧 Patching build.sh to allow skipping redundant prepare_vscode.sh..."
+  perl -pi -e 's/\. prepare_vscode.sh/if [ "\$SKIP_PREPARE" != "yes" ]; then . prepare_vscode.sh; fi/' "$VSCODIUM_DIR/build.sh"
+  echo "  ✅ build.sh patched"
+fi
+
+echo "✨ Codesphere branding application complete!"

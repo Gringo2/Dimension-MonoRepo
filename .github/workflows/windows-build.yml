@@ -53,15 +53,6 @@ jobs:
         choco install -y jq ripgrep
         npm install -g node-gyp
     
-    - name: Apply Codesphere branding
-      shell: bash
-      run: |
-        chmod +x ci/*.sh
-        ./ci/ci-branding.sh
-      env:
-        OS_NAME: windows
-        VSCODE_ARCH: ${{ matrix.arch }}
-    
     - name: Fetch VSCodium Source
       working-directory: vendor/vscodium
       shell: bash
@@ -69,8 +60,26 @@ jobs:
       env:
         OS_NAME: windows
         VSCODE_ARCH: ${{ matrix.arch }}
+        VSCODE_LATEST: no
 
-    - name: Enforce Source Branding
+    - name: Apply Script/Asset Branding
+      shell: bash
+      run: |
+        chmod +x ci/*.sh
+        ./ci/ci-branding.sh
+      env:
+        OS_NAME: windows
+        VSCODE_ARCH: ${{ matrix.arch }}
+
+    - name: Prepare VS Code Source (VSCodium Patches)
+      working-directory: vendor/vscodium
+      shell: bash
+      run: ./prepare_vscode.sh
+      env:
+        OS_NAME: windows
+        VSCODE_ARCH: ${{ matrix.arch }}
+        
+    - name: Enforce Source Branding (Codesphere Overrides)
       shell: bash
       run: ./ci/enforce-branding.sh
       env:
@@ -85,6 +94,7 @@ jobs:
       working-directory: vendor/vscodium
       shell: bash
       run: |
+        export SKIP_PREPARE=yes
         export SHOULD_BUILD=yes
         export SHOULD_BUILD_REH=no
         export CI_BUILD=no

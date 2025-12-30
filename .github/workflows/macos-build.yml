@@ -53,22 +53,30 @@ jobs:
         brew install jq ripgrep
         rustup target add x86_64-apple-darwin aarch64-apple-darwin
     
-    - name: Apply Codesphere branding
-      run: |
-        chmod +x ci/*.sh
-        ./ci/ci-branding.sh
-      env:
-        OS_NAME: osx
-        VSCODE_ARCH: ${{ matrix.arch }}
-    
     - name: Fetch VSCodium Source
       working-directory: vendor/vscodium
       run: ./get_repo.sh
       env:
         OS_NAME: osx
         VSCODE_ARCH: ${{ matrix.arch }}
+        VSCODE_LATEST: no
 
-    - name: Enforce Source Branding
+    - name: Apply Script/Asset Branding
+      run: |
+        chmod +x ci/*.sh
+        ./ci/ci-branding.sh
+      env:
+        OS_NAME: osx
+        VSCODE_ARCH: ${{ matrix.arch }}
+
+    - name: Prepare VS Code Source (VSCodium Patches)
+      working-directory: vendor/vscodium
+      run: ./prepare_vscode.sh
+      env:
+        OS_NAME: osx
+        VSCODE_ARCH: ${{ matrix.arch }}
+        
+    - name: Enforce Source Branding (Codesphere Overrides)
       run: ./ci/enforce-branding.sh
       env:
         OS_NAME: osx
@@ -80,6 +88,7 @@ jobs:
     - name: Build VSCodium
       working-directory: vendor/vscodium
       run: |
+        export SKIP_PREPARE=yes
         export SHOULD_BUILD=yes
         export SHOULD_BUILD_REH=no
         export CI_BUILD=no

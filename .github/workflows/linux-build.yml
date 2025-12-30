@@ -58,7 +58,15 @@ jobs:
           libsecret-1-dev libkrb5-dev \
           fakeroot rpm dpkg jq ripgrep
     
-    - name: Apply Codesphere branding
+    - name: Fetch VSCodium Source
+      working-directory: vendor/vscodium
+      run: ./get_repo.sh
+      env:
+        OS_NAME: linux
+        VSCODE_ARCH: ${{ matrix.arch }}
+        VSCODE_LATEST: no
+
+    - name: Apply Script/Asset Branding
       run: |
         chmod +x ci/*.sh
         ./ci/ci-branding.sh
@@ -66,14 +74,14 @@ jobs:
         OS_NAME: linux
         VSCODE_ARCH: ${{ matrix.arch }}
     
-    - name: Fetch VSCodium Source
+    - name: Prepare VS Code Source (VSCodium Patches)
       working-directory: vendor/vscodium
-      run: ./get_repo.sh
+      run: ./prepare_vscode.sh
       env:
         OS_NAME: linux
         VSCODE_ARCH: ${{ matrix.arch }}
         
-    - name: Enforce Source Branding
+    - name: Enforce Source Branding (Codesphere Overrides)
       run: ./ci/enforce-branding.sh
       env:
         OS_NAME: linux
@@ -85,6 +93,7 @@ jobs:
     - name: Build VSCodium
       working-directory: vendor/vscodium
       run: |
+        export SKIP_PREPARE=yes
         export SHOULD_BUILD=yes
         export SHOULD_BUILD_REH=no
         export CI_BUILD=no
