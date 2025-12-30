@@ -43,12 +43,36 @@ if [ -f "$BRANDING_DIR/product.json" ]; then
   echo "  ✅ Codesphere product.json copied"
 fi
 
-# Copy icons to VSCodium's icon locations
-if [ -d "icons/stable" ]; then
-  if [ -f "$BRANDING_DIR/code.png" ]; then
-    cp "$BRANDING_DIR/code.png" icons/stable/codium_src.png
-    echo "  ✅ Icons copied"
+# Copy icons to VSCodium's source resource locations (Correct paths)
+# This overrides the upstream assets directly in the source tree before build
+if [ -d "src/stable/resources" ]; then
+  echo "  📷 overwriting platform icons in src/stable/resources..."
+
+  # Windows Icon
+  if [ -f "$BRANDING_DIR/code.ico" ]; then
+    cp "$BRANDING_DIR/code.ico" src/stable/resources/win32/code.ico
+    echo "    ✅ Windows icon (code.ico) overwritten"
+  else
+    echo "    ⚠️ Windows icon not found in branding!"
   fi
+
+  # macOS Icon
+  if [ -f "$BRANDING_DIR/code.icns" ]; then
+    cp "$BRANDING_DIR/code.icns" src/stable/resources/darwin/code.icns
+    echo "    ✅ macOS icon (code.icns) overwritten"
+  else
+    echo "    ⚠️ macOS icon not found in branding!"
+  fi
+
+  # Linux Icon
+  if [ -f "$BRANDING_DIR/code.png" ]; then
+    cp "$BRANDING_DIR/code.png" src/stable/resources/linux/code.png
+    echo "    ✅ Linux icon (code.png) overwritten"
+  else
+    echo "    ⚠️ Linux icon not found in branding!"
+  fi
+else
+  echo "  ⚠️ src/stable/resources not found! Icons might not be updated."
 fi
 
 echo ""
