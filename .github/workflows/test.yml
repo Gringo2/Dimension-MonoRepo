@@ -90,6 +90,8 @@ jobs:
       run: |
         yarn install --frozen-lockfile
         yarn compile
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
     - name: Verify branding
       run: |
