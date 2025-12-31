@@ -30,12 +30,12 @@ cd "$VSCODE_DIR" || exit 1
 echo "  Replacing 'VSCodium' -> 'Codesphere'..."
 find . -type f \( -name "*.ts" -o -name "*.js" -o -name "*.html" -o -name "*.json" -o -name "*.md" \) \
   -not -path "*/node_modules/*" -not -path "*/.git/*" \
-  -exec perl -pi -e 's/(?<!github.com\/)VSCodium/Codesphere/g' {} +
+  -exec perl -pi -e 's/(?<!github.com\/)(?<!\@)VSCodium/Codesphere/g' {} +
 
 echo "  Replacing 'vscodium' -> 'codesphere'..."
 find . -type f \( -name "*.ts" -o -name "*.js" -o -name "*.html" -o -name "*.json" -o -name "*.md" \) \
   -not -path "*/node_modules/*" -not -path "*/.git/*" \
-  -exec perl -pi -e 's/(?<!github.com\/)vscodium/codesphere/g' {} +
+  -exec perl -pi -e 's/(?<!github.com\/)(?<!\@)vscodium/codesphere/g' {} +
 
 echo "  Replacing 'Visual Studio Code' -> 'Codesphere IDE'..."
 find . -type f \( -name "*.ts" -o -name "*.js" -o -name "*.html" -o -name "*.json" -o -name "*.md" \) \
