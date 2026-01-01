@@ -28,23 +28,33 @@ cd "$VSCODE_DIR" || exit 1
 # though we already updated product.json to point to Codesphere's own URLs.
 
 echo "  Replacing 'VSCodium' -> 'Codesphere'..."
-find . -type f \( -name "*.ts" -o -name "*.js" -o -name "*.html" -o -name "*.json" -o -name "*.md" \) \
+find . -type f \( -name "*.ts" -o -name "*.js" -o -name "*.html" -o -name "*.json" -o -name "*.md" -o -name "*.iss" -o -name "*.xml" -o -name "*.spec.template" -o -name "*.yaml" -o -name "*.template" \) \
   -not -path "*/node_modules/*" -not -path "*/.git/*" \
   -exec perl -pi -e 's/(?<!github.com\/)(?<!\@)VSCodium/Codesphere/g' {} +
 
 echo "  Replacing 'vscodium' -> 'codesphere'..."
-find . -type f \( -name "*.ts" -o -name "*.js" -o -name "*.html" -o -name "*.json" -o -name "*.md" \) \
+find . -type f \( -name "*.ts" -o -name "*.js" -o -name "*.html" -o -name "*.json" -o -name "*.md" -o -name "*.iss" -o -name "*.xml" -o -name "*.spec.template" -o -name "*.yaml" -o -name "*.template" \) \
   -not -path "*/node_modules/*" -not -path "*/.git/*" \
   -exec perl -pi -e 's/(?<!github.com\/)(?<!\@)vscodium/codesphere/g' {} +
 
 echo "  Replacing 'Visual Studio Code' -> 'Codesphere IDE'..."
-find . -type f \( -name "*.ts" -o -name "*.js" -o -name "*.html" -o -name "*.json" -o -name "*.md" \) \
+find . -type f \( -name "*.ts" -o -name "*.js" -o -name "*.html" -o -name "*.json" -o -name "*.md" -o -name "*.iss" -o -name "*.xml" -o -name "*.spec.template" -o -name "*.yaml" -o -name "*.template" \) \
   -not -path "*/node_modules/*" -not -path "*/.git/*" \
   -exec perl -pi -e 's/Visual Studio Code/Codesphere IDE/g' {} +
 
 echo "  Replacing 'VS Code' -> 'Codesphere'..."
-find . -type f \( -name "*.ts" -o -name "*.js" -o -name "*.html" -o -name "*.json" -o -name "*.md" \) \
+find . -type f \( -name "*.ts" -o -name "*.js" -o -name "*.html" -o -name "*.json" -o -name "*.md" -o -name "*.iss" -o -name "*.xml" -o -name "*.spec.template" -o -name "*.yaml" -o -name "*.template" \) \
   -not -path "*/node_modules/*" -not -path "*/.git/*" \
   -exec perl -pi -e 's/VS Code/Codesphere/g' {} +
+
+echo "  Replacing 'Microsoft Corporation' -> 'Codesphere'..."
+find . -type f \( -name "*.ts" -o -name "*.js" -o -name "*.html" -o -name "*.json" -o -name "*.md" -o -name "*.iss" -o -name "*.xml" -o -name "*.spec.template" -o -name "*.yaml" -o -name "*.template" \) \
+  -not -path "*/node_modules/*" -not -path "*/.git/*" \
+  -exec perl -pi -e 's/Microsoft Corporation/Codesphere/g' {} +
+
+echo "  Replacing 'code.visualstudio.com' -> 'codesphere.com'..."
+find . -type f \( -name "*.ts" -o -name "*.js" -o -name "*.html" -o -name "*.json" -o -name "*.md" -o -name "*.iss" -o -name "*.xml" -o -name "*.spec.template" -o -name "*.yaml" -o -name "*.template" \) \
+  -not -path "*/node_modules/*" -not -path "*/.git/*" \
+  -exec perl -pi -e 's/code.visualstudio.com/codesphere.com/g' {} +
 
 echo "✅ Source code branding enforcement complete!"
