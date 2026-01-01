@@ -18,11 +18,22 @@ on:
       - 'ci/**'
       - 'vendor/vscodium/**'
   workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'Release Version'
+        required: false
+        type: string
+      publish:
+        description: 'Publish Release'
+        required: false
+        type: boolean
+        default: false
 
 env:
   APP_NAME: Codesphere
   BINARY_NAME: codesphere
   VSCODE_QUALITY: stable
+  RELEASE_VERSION: ${{ github.event.inputs.release_version }}
 
 jobs:
   build-windows:
@@ -115,11 +126,12 @@ jobs:
 
     - name: Create / Update Release
       uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/tags/v')
+      if: startsWith(github.ref, 'refs/tags/v') || github.event.inputs.publish == 'true'
       with:
-        name: Codesphere ${{ github.ref_name }}
+        tag_name: ${{ env.RELEASE_VERSION }}
+        name: Codesphere ${{ env.RELEASE_VERSION }}
         body: |
-          ## Codesphere ${{ github.ref_name }}
+          ## Codesphere ${{ env.RELEASE_VERSION }}
           A sovereign developer IDE with zero Microsoft dependencies.
         files: |
           vendor/vscodium/VSCode-win32-${{ matrix.arch }}/*.exe
