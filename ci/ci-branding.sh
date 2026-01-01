@@ -60,8 +60,11 @@ if [ -f "$VSCODIUM_DIR/prepare_vscode.sh" ]; then
   perl -pi -e 's/setpath "product" "(nameShort|nameLong|applicationName|linuxIconName|urlProtocol|serverApplicationName|serverDataFolderName|darwinBundleIdentifier|win32AppUserModelId|win32DirName|win32MutexName|win32NameVersion|win32RegValueName|win32ShellNameShort)" ".*"/# branding parameter suppressed by Codesphere patch/' "$VSCODIUM_DIR/prepare_vscode.sh"
 
   # Prevent prepare_vscode.sh from messing with code.iss (we handle it in enforce-branding.sh)
+  # Prevent prepare_vscode.sh from messing with code.iss (we handle it in enforce-branding.sh)
+  # IMPORTANT: We replace the command with "true" (no-op) to ensure the if/elif block isn't left empty,
+  # which would cause a "syntax error near unexpected token fi"
   echo "🔧 Patching prepare_vscode.sh to leave code.iss alone..."
-  perl -pi -e 's/sed -i .s\|Microsoft Corporation\|VSCodium\|. build\/win32\/code.iss/# code.iss modification suppressed/' "$VSCODIUM_DIR/prepare_vscode.sh"
+  perl -pi -e 's/sed -i .s\|Microsoft Corporation\|VSCodium\|. build\/win32\/code.iss/true; # code.iss modification suppressed/' "$VSCODIUM_DIR/prepare_vscode.sh"
   perl -pi -e 's/sed -i .s\|https:\/\/code.visualstudio.com\|https:\/\/vscodium.com\|. build\/win32\/code.iss/# code.iss modification suppressed/' "$VSCODIUM_DIR/prepare_vscode.sh"
   
   # Ensure the product.json merge at the end doesn't overwrite our product.json if we want to be safe,
