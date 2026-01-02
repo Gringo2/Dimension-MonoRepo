@@ -14,7 +14,7 @@ graph TD
     subgraph "Codesphere Layer"
         B[branding/product.json]
         A[branding/icons]
-        S[ci/enforce-branding.sh]
+        S[ci/patches/codesphere-brand.patch]
     end
 
     subgraph "VSCodium Layer"
@@ -45,9 +45,10 @@ This is the single source of truth for the Codesphere brand.
 - **Icon Assets**: High-resolution `.ico`, `.icns`, and `.png` files that are overwritten directly into the source resource folders.
 
 ### 🛠️ Injection Logic (`ci/`)
-- **`ci-branding.sh`**: The "Preparer". It patches VSCodium's build scripts so they don't revert our changes and copies the basic config/icons.
-- **`enforce-branding.sh`**: The "Rebrander". This high-performance script runs *after* the VS Code source is fetched but *before* compilation. it performs over 1,000+ regex-based string replacements in the source code to ensure the UI reflects the Codesphere name.
-- **`compliance-check.sh`**: The "Gatekeeper". It uses `ripgrep` to verify that no forbidden brand references (like "VSCodium") remain in the source before building.
+- **`ci-branding.sh`**: The "Preparer". It applies the Codesphere brand patch and patches VSCodium's build scripts to preserve our changes.
+- **`generate-brand-patch.sh`**: The "Patch Generator". Creates a git patch with all Codesphere branding changes (VSCodium → Codesphere replacements).
+- **`patches/codesphere-brand.patch`**: The "Brand Patch". Applied during build to rebrand VSCodium source to Codesphere (aligned with VSCodium's own patch methodology).
+- **`compliance-check.sh`**: The "Gatekeeper". Uses `ripgrep` to verify that no forbidden brand references (like "VSCodium") remain in the source before building.
 
 ### 📦 Platform-Specific Build Pipelines
 We have split the unified build into three distinct workflows for maximum reliability:
@@ -69,7 +70,7 @@ Codesphere points directly to **Open VSX**. This means:
 ### Telemetry Elimination
 Privacy is enforced through **Defense-in-Depth**:
 1.  **Level 1 (Config)**: `telemetry.enableTelemetry` is explicitly set to `false` in `product.json`.
-2.  **Level 2 (Source)**: `enforce-branding.sh` wipes out telemetry endpoint strings.
+2.  **Level 2 (Source)**: The `codesphere-brand.patch` removes telemetry endpoint strings via git patch.
 3.  **Level 3 (VSCodium)**: We leverage VSCodium's existing logic for stripping proprietary telemetry handlers from the core source.
 
 ---
@@ -78,9 +79,10 @@ Privacy is enforced through **Defense-in-Depth**:
 
 To update Codesphere to the latest VS Code version:
 1. Update matching VSCodium version: `git submodule update --remote`.
-2. Push to `main`.
-3. The CI pipeline will automatically apply all dynamic rebranding to the new source version.
-4. If the build fails the compliance check, new regex patterns can be added to `enforce-branding.sh`.
+2. Regenerate the brand patch: `./ci/generate-brand-patch.sh`
+3. Push to `main`.
+4. The CI pipeline will automatically apply the brand patch to the new source version.
+5. If the build fails the compliance check, update the branding logic in `generate-brand-patch.sh` and regenerate the patch.
 
 ---
 *Last Updated: 2025-12-30*

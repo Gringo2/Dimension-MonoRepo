@@ -14,9 +14,9 @@ We have explicitly disabled all built-in telemetry services at the product confi
 
 ## 2. Source-Level Endpoint Neutralization
 
-The `ci/enforce-branding.sh` script performs a deep-scan and replacement of strings that could bypass configuration.
+The `ci/patches/codesphere-brand.patch` performs a deep-scan and replacement of strings that could bypass configuration.
 
-- **String Replacement**: The script removes references that link telemetry handlers back to corporate endpoints.
+- **String Replacement**: The patch removes references that link telemetry handlers back to corporate endpoints.
 - **VSCodium Cleanup**: We benefit from the underlying [VSCodium source cleaning](https://github.com/VSCodium/vscodium/blob/master/undo_telemetry.sh) which strips proprietary telemetry libraries and their associated API keys from the VS Code core during the `get_repo.sh` phase.
 
 ## 3. Network Sovereignty

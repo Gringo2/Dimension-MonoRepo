@@ -19,16 +19,20 @@ When a new version of VSCodium is released, follow these steps to update Codesph
 git submodule update --remote vendor/vscodium
 ```
 
-### Step B: Local Validation Build
-Check if our branding pipeline still works with the new source.
+### Step B: Regenerate Brand Patch
+Regenerate the Codesphere brand patch to work with the new VSCodium version.
 
 ```bash
+# Generate updated brand patch
+./ci/generate-brand-patch.sh
+
 # Apply branding prep
 ./ci/ci-branding.sh
 
 # Run the fetch and build
 cd vendor/vscodium
 ./get_repo.sh
+./prepare_vscode.sh
 ./build.sh
 ```
 
@@ -45,8 +49,8 @@ cd ../..
 ## 3. Handling Regression / Failures
 
 If the **Compliance Check Fails**:
-- This means upstream added new UI strings that aren't covered by `enforce-branding.sh`.
-- **Fix**: Identify the new strings and add their patterns to the `find ... sed` block in `ci/enforce-branding.sh`.
+- This means upstream added new UI strings that aren't covered by the brand patch.
+- **Fix**: Update the branding logic in `ci/generate-brand-patch.sh`, then regenerate the patch by running `./ci/generate-brand-patch.sh`.
 
 If the **Build Fails**:
 - Upstream might have changed filenames or the structure of `prepare_vscode.sh`.

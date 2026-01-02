@@ -36,62 +36,33 @@ brew install jq
 
 ---
 
-## 🚀 The Fast Track (Recommended)
+## 🚀 Quick Start Build
 
-We provide a master orchestration script that handles everything from fetching the source to running the compliance check.
-
-### On Linux/macOS:
+### 1. Generate the Branding Patch
+First time only - create the `codesphere-brand.patch`:
 ```bash
-# Apply branding and prepare source
-./ci/patch-branding.sh
-
-# Run the final build
-cd vendor/vscodium
-./build.sh
+./ci/generate-brand-patch.sh
 ```
 
-### On Windows (PowerShell):
-```powershell
-# Apply branding and prepare source
-.\ci\patch-branding.ps1
-
-# Run the final build
-cd vendor/vscodium
-.\build.sh
-```
-
----
-
-## 🛠️ Granular Build Steps
-
-If you need more control over the build process, you can run the steps manually:
-
-### 1. Sync Submodules
+### 2. Apply Branding and Prepare Source
 ```bash
+# Initialize submodules and fetch VS Code source
 git submodule update --init --recursive
-```
-
-### 2. Prepare Source
-```bash
 cd vendor/vscodium
 ./get_repo.sh
-```
 
-### 3. Apply Rebranding
-```bash
+# Apply Codesphere branding
 cd ../..
 ./ci/ci-branding.sh
-./ci/enforce-branding.sh
+
+# Run VSCodium preparation
+cd vendor/vscodium
+./prepare_vscode.sh
 ```
 
-### 4. Verify Compliance
+### 3. Build
 ```bash
-./ci/compliance-check.sh
-```
-
-### 5. Compile & Package
-```bash
-cd vendor/vscodium/vscode
+cd vscode
 
 # Install dependencies
 yarn install --frozen-lockfile
@@ -99,8 +70,7 @@ yarn install --frozen-lockfile
 # Compile
 yarn compile
 
-# Create Minified Build (Package)
-# Use your platform's target:
+# Create packaged build (choose your platform)
 # Windows: vscode-win32-x64-min
 # macOS: vscode-darwin-arm64-min / vscode-darwin-x64-min
 # Linux: vscode-linux-x64-min / vscode-linux-arm64-min
@@ -109,15 +79,16 @@ yarn gulp vscode-linux-x64-min
 
 ---
 
-## 🧪 Testing the Build
+## ✅ Verifying the Build
 
-Once the build is complete, you can find the binaries in:
+Once complete, find the binaries in:
 `vendor/vscodium/VSCode-[platform]-[arch]`
 
-Launch the executable and verify:
-1. **App Name**: Should be "Codesphere" in the title bar.
-2. **Icons**: Should show the Codesphere logo in the taskbar/dock.
-3. **About Dialog**: Should display "Codesphere" and your specific build version.
+Launch and verify:
+1. **App Name**: Should be "Codesphere" in the title bar
+2. **Icons**: Should show the Codesphere logo
+3. **About Dialog**: Should display "Codesphere" and build version
 
 ---
+
 *Codesphere: A sovereign IDE distribution.*
