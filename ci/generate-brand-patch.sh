@@ -15,44 +15,63 @@ if [ -f "$REPO_ROOT/ci/env.sh" ]; then
   . "$REPO_ROOT/ci/env.sh"
 fi
 
-# Temporary workspace vars
+# Temporary workspace vars (default)
 TEMP_ROOT="$REPO_ROOT/build_temp"
 TEMP_VSCODIUM="$TEMP_ROOT/vscodium"
 TEMP_VSCODE="$TEMP_VSCODIUM/vscode"
 
-echo "🔧 Codesphere Brand Patch Generator"
-echo "===================================="
-echo "Working directory: $TEMP_ROOT"
+# Default to using temp dir
+USE_TEMP_DIR=true
+TARGET_VSCODE="$TEMP_VSCODE"
 
-# Cleanup any previous run
-rm -rf "$TEMP_ROOT"
-mkdir -p "$TEMP_VSCODIUM"
-
-# 1. Copy VSCodium scripts to temp dir (so we can fix CRLF safely)
-echo "📦 Copying VSCodium scripts to temp workspace..."
-cp -r "$VSCODIUM_SUBMODULE/"* "$TEMP_VSCODIUM/"
-
-# 2. Fix CRLF line endings in the temp scripts (crucial for Windows/WSL)
-echo "🔧 Fixing CRLF line endings in temp scripts..."
-find "$TEMP_VSCODIUM" -name "*.sh" -type f -exec sed -i 's/\r$//' {} +
-
-# 3. Fetch VS Code source using the temp scripts
-echo "📥 Fetching VS Code source (this may take time)..."
-cd "$TEMP_VSCODIUM" || exit 1
-# Force bash usage to ensuring expected behavior
-bash ./get_repo.sh
-
-# 4. Verify fetch success
-if [ ! -d "$TEMP_VSCODE/.git" ]; then
-  echo "❌ Error: Failed to fetch vscode source in temp dir"
-  exit 1
+# Check arguments
+if [[ "$1" == "--in-place" ]] || [[ "$CI_BUILD" == "yes" ]]; then
+  echo "⚙️  CI/In-Place mode detected."
+  USE_TEMP_DIR=false
+  TARGET_VSCODE="$REPO_ROOT/vendor/vscodium/vscode"
 fi
 
-echo "✅ Clean vscode checkout ready in temp dir"
+if [ "$USE_TEMP_DIR" = true ]; then
+  echo "Working directory: $TEMP_ROOT"
+
+  # Cleanup any previous run
+  rm -rf "$TEMP_ROOT"
+  mkdir -p "$TEMP_VSCODIUM"
+
+  # 1. Copy VSCodium scripts to temp dir (so we can fix CRLF safely)
+  echo "📦 Copying VSCodium scripts to temp workspace..."
+  cp -r "$VSCODIUM_SUBMODULE/"* "$TEMP_VSCODIUM/"
+
+  # 2. Fix CRLF line endings in the temp scripts (crucial for Windows/WSL)
+  echo "🔧 Fixing CRLF line endings in temp scripts..."
+  find "$TEMP_VSCODIUM" -name "*.sh" -type f -exec sed -i 's/\r$//' {} +
+
+  # 3. Fetch VS Code source using the temp scripts
+  echo "📥 Fetching VS Code source (this may take time)..."
+  cd "$TEMP_VSCODIUM" || exit 1
+  # Force bash usage to ensuring expected behavior
+  bash ./get_repo.sh
+
+  # 4. Verify fetch success
+  if [ ! -d "$TEMP_VSCODE/.git" ]; then
+    echo "❌ Error: Failed to fetch vscode source in temp dir"
+    exit 1
+  fi
+  
+  echo "✅ Clean vscode checkout ready in temp dir"
+else
+  echo "📂 Using existing source at: $TARGET_VSCODE"
+  if [ ! -d "$TARGET_VSCODE/.git" ]; then
+    echo "❌ Error: $TARGET_VSCODE is not a git repository"
+    echo "Please ensure get_repo.sh has been run."
+    exit 1
+  fi
+fi
+
 echo ""
 echo "🎨 Applying Codesphere branding changes..."
 
-cd "$TEMP_VSCODE" || exit 1
+cd "$TARGET_VSCODE" || exit 1
 
 # Apply branding replacements (Regex logic from original enforce-branding.sh)
 
@@ -107,9 +126,15 @@ if [ -s "$PATCH_OUTPUT" ]; then
   echo "   Lines: $PATCH_LINES"
   
   # Cleanup
-  echo "🧹 Cleaning up temp workspace..."
-  cd "$REPO_ROOT"
-  rm -rf "$TEMP_ROOT"
+  if [ "$USE_TEMP_DIR" = true ]; then
+    echo "🧹 Cleaning up temp workspace..."
+    cd "$REPO_ROOT"
+    rm -rf "$TEMP_ROOT"
+  else
+    echo "🧹 Resetting source directory..."
+    git reset --hard HEAD
+    git clean -fd
+  fi
   echo "✨ Done."
 else
   echo "❌ No changes detected - patch file is empty"

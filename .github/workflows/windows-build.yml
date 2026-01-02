@@ -73,10 +73,17 @@ jobs:
         VSCODE_ARCH: ${{ matrix.arch }}
         VSCODE_LATEST: no
 
-    - name: Apply Script/Asset Branding
+        VSCODE_LATEST: no
+    
+    - name: Generate Branding Patch
       shell: bash
       run: |
         chmod +x ci/*.sh
+        ./ci/generate-brand-patch.sh --in-place
+
+    - name: Apply Script/Asset Branding
+      shell: bash
+      run: |
         ./ci/ci-branding.sh
       env:
         OS_NAME: windows
