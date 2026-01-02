@@ -90,12 +90,6 @@ jobs:
         OS_NAME: windows
         VSCODE_ARCH: ${{ matrix.arch }}
         
-    - name: Enforce Source Branding (Codesphere Overrides)
-      shell: bash
-      run: ./ci/enforce-branding.sh
-      env:
-        OS_NAME: windows
-        
     - name: Run Compliance Check
       shell: bash
       run: ./ci/compliance-check.sh

@@ -87,11 +87,6 @@ jobs:
         OS_NAME: osx
         VSCODE_ARCH: ${{ matrix.arch }}
         
-    - name: Enforce Source Branding (Codesphere Overrides)
-      run: ./ci/enforce-branding.sh
-      env:
-        OS_NAME: osx
-        
     - name: Run Compliance Check
       run: ./ci/compliance-check.sh
       continue-on-error: true
